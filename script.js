@@ -402,8 +402,8 @@ $("#restart-game").on("click", function () {
   currentPlayer = 0;
   gameOver = false;
 
-  movePlayerToCell(0);
-  movePlayerToCell(1);
+  movetocell(0);
+  movetocell(1);
 
   updatePositions();
 
