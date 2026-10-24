@@ -15,7 +15,7 @@ for (let row = 0; row < 10; row++) {
       cellClass = "cell-odd";
     }
     $(".board").append(
-      `<div data-number='${number}' class='cell ${cellClass}'>${number}</div>`,
+      `<div data-number='${number}' class="cell ${cellClass}">${number}</div>`,
     );
   }
 }
@@ -324,37 +324,6 @@ Object.keys(snakes).forEach(function (x) {
     .append("<span class = 'snake-icon'></span>");
 });
 
-let positions = [1, 1];
-let currentPlayer = 0;
-let gameOver = false;
-
-let players = [
-  $("<div class='player'></div>"),
-  $("<div class='player player-two'></div>"),
-];
-
-// Move a player to the correct cell
-function movePlayerToCell(playerIndex) {
-  const position = positions[playerIndex];
-
-  players[playerIndex].detach();
-
-  $(".cell")
-    .filter(function () {
-      return Number($(this).attr("data-number")) === position;
-    })
-    .append(players[playerIndex]);
-}
-
-// Update both players' positions
-function updatePositions() {
-  $("#player-position").text(`Player 1: Position ${positions[0]}`);
-
-  $("#player2-position").text(`Player 2: Position ${positions[1]}`);
-}
-
-// Initialize the game
-const image1 = document.querySelector(".img1");
 const images = [
   "images/dice1.png",
   "images/dice2.png",
@@ -363,43 +332,51 @@ const images = [
   "images/dice5.png",
   "images/dice6.png",
 ];
-movePlayerToCell(0);
-movePlayerToCell(1);
+
+let positions = [1, 1];
+let currentPlayer = 0;
+let gameOver = false;
+
+let players = [
+  $("<div class='player'></div>"),
+  $("<div class='player player-two'></div>"),
+];
+/////////////
+function movetocell(index) {
+  $(".cell")
+    .filter(function () {
+      return Number($(this).attr("data-number")) === positions[index];
+    })
+    .append(players[index]);
+}
+
+// Update both players' positions
+function updatePositions() {
+  $("#player-position").text(`Player 1: Position ${positions[0]}`);
+
+  $("#player2-position").text(`Player 2: Position ${positions[1]}`);
+}
+movetocell(0);
+movetocell(1);
 updatePositions();
-
-$("#current-turn").text("Turn: Player 1 🔴");
-
-// Roll the dice
+//////////
 $("#roll-dice").on("click", function () {
   if (gameOver) return;
-
-  const dice = Math.floor(Math.random() * images.length);
-
-  $("#dice-result").html(`<img src='${images[dice]}'></img>`);
-
-  const newPosition = positions[currentPlayer] + dice;
-
-  // Prevent players from moving beyond cell 100
+  let dice = Math.floor(Math.random() * images.length);
+  $("#dice-result").html(`<img src="${images[dice]}" />`);
+  dice++;
+  let newPosition = dice + positions[currentPlayer];
   if (newPosition <= 100) {
     positions[currentPlayer] = newPosition;
-
-    // Check for ladders and snakes
-    while (true) {
-      if (ladders[positions[currentPlayer]] !== undefined) {
-        positions[currentPlayer] = ladders[positions[currentPlayer]];
-      } else if (snakes[positions[currentPlayer]] !== undefined) {
-        positions[currentPlayer] = snakes[positions[currentPlayer]];
-      } else {
-        break;
-      }
-    }
-
-    movePlayerToCell(currentPlayer);
   }
-
+  if (ladders[positions[currentPlayer]] !== undefined) {
+    positions[currentPlayer] = ladders[positions[currentPlayer]];
+  } else if (snakes[positions[currentPlayer]] !== undefined) {
+    positions[currentPlayer] = snakes[positions[currentPlayer]];
+  }
+  movetocell(currentPlayer);
   updatePositions();
-
-  // Check for a winner
+  //
   if (positions[currentPlayer] === 100) {
     gameOver = true;
 
@@ -412,15 +389,14 @@ $("#roll-dice").on("click", function () {
     return;
   }
 
-  // Switch turns
+  /////////////
   currentPlayer = 1 - currentPlayer;
 
   const color = currentPlayer === 0 ? "🔴" : "🔵";
 
   $("#current-turn").text(`Turn: Player ${currentPlayer + 1} ${color}`);
 });
-
-// Restart the game
+/////////
 $("#restart-game").on("click", function () {
   positions = [1, 1];
   currentPlayer = 0;
